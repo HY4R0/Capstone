@@ -102,7 +102,7 @@ def enemy_turn(player: Character, enemy: Character) -> str:
 
 def main() -> None:
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("Tactical Combat Prototype")
+    pygame.display.set_caption("PlaceHolder")
     clock = pygame.time.Clock()
 
     player = create_player()
