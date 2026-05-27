@@ -1,75 +1,86 @@
-import pygame
+from dataclasses import dataclass
+from typing import Dict, Tuple, Set
 
-class Entity:
-    def __init__(self, x, y, hp, color, tile_size):
-        self.grid_x = x  # Position in grid coordinates (e.g., tile 5, tile 4)
-        self.grid_y = y
-        self.hp = hp
-        self.max_hp = hp
-        self.color = color
-        self.tile_size = tile_size
 
-    def draw(self, surface):
-        # Calculate pixel position based on grid position
-        pixel_x = self.grid_x * self.tile_size
-        pixel_y = self.grid_y * self.tile_size
-        rect = pygame.Rect(pixel_x, pixel_y, self.tile_size, self.tile_size)
-        pygame.draw.rect(surface, self.color, rect)
+@dataclass
+class Weapon:
+    name: str
+    damage: int
+    range: int
+    ap_cost: int
 
-class Player(Entity):
-    def __init__(self, x, y, tile_size):
-        # Players have 100 HP, green color (Pip-Boy style), and 10 Action Points
-        super().__init__(x, y, 100, (0, 255, 0), tile_size)
-        self.max_ap = 10
+@dataclass
+class Character:
+    name: str
+    stats: Dict[str, int]
+    hp: int
+    max_hp: int
+    weapon_ranged: Weapon
+    weapon_melee: Weapon
+    weapon: Weapon
+    position: Tuple[int, int]
+    ap: int = 0
+    max_ap: int = 6
+
+    def start_turn(self) -> None:
         self.ap = self.max_ap
-        self.stimpacks = 3
 
-    def move(self, dx, dy, game_map):
-        # Check boundaries and walls (0 = empty space, 1 = wall)
-        new_x = self.grid_x + dx
-        new_y = self.grid_y + dy
-        
-        if 0 <= new_x < len(game_map[0]) and 0 <= new_y < len(game_map):
-            if game_map[new_y][new_x] == 0:
-                if self.ap >= 1:
-                    self.grid_x = new_x
-                    self.grid_y = new_y
-                    self.ap -= 1
-                    return True
+    def move(self, dx: int, dy: int, occupied: Set[Tuple[int, int]]) -> bool:
+        # movement cost and valid tile checks go here
         return False
 
-    def heal(self):
-        if self.stimpacks > 0 and self.ap >= 2:
-            self.hp = min(self.max_hp, self.hp + 30)
-            self.stimpacks -= 1
-            self.ap -= 2
-            return True
+    def can_attack(self, target: "Character") -> bool:
+        # range checks and AP checks go here
         return False
 
-class Enemy(Entity):
-    def __init__(self, x, y, tile_size):
-        # Enemies have 30 HP and are red
-        super().__init__(x, y, 30, (255, 0, 0), tile_size)
+    def attack(self, target: "Character") -> bool:
+        # attack resolution stub
+        return False
 
-    def take_turn(self, player, game_map):
-        """Simple AI: Move 1 step closer to the player on the grid."""
-        if self.hp <= 0:
-            return
+def player_name_input() -> str:
+    name = input("Enter your character's name: ")
+    if not name.strip():
+        return "Player"
+    return name
 
-        dx = player.grid_x - self.grid_x
-        dy = player.grid_y - self.grid_y
+def create_player() -> Character:
+    return Character(
+        name= player_name_input(),
+        stats={"Health": 5, "Agility": 6, "Strength": 5, "Thinking": 7, "Endurance": 4},
+        hp="Health" * 5,
+        max_hp="Health" * 5,
+        weapon_ranged=Weapon(name="9mm Pistol", damage=8, range=4, ap_cost=3),
+        weapon_melee=Weapon(name="Combat Knife", damage=4, range=1, ap_cost=2),
+        position=(2, 7),
+    )
 
-        # Move horizontally or vertically toward player
-        move_x = 1 if dx > 0 else -1 if dx < 0 else 0
-        move_y = 1 if dy > 0 else -1 if dy < 0 else 0
 
-        # Simple attack trigger if adjacent
-        if abs(dx) + abs(dy) == 1:
-            player.hp -= 5
-            print(f"Enemy bit you! Player HP: {player.hp}")
-        else:
-            # Otherwise, move closer if there's no wall
-            if move_x != 0 and game_map[self.grid_y][self.grid_x + move_x] == 0:
-                self.grid_x += move_x
-            elif move_y != 0 and game_map[self.grid_y + move_y][self.grid_x] == 0:
-                self.grid_y += move_y
+def create_enemy() -> Character:
+    return Character(
+        name="Raddle Snake",
+        stats={"Health": 3, "Agility": 7, "Strength": 5, "Thinking": 2, "Endurance": 2},
+        hp="Health" * 5,
+        max_hp="Health" * 5,
+        weapon=Weapon(name="Bite", damage=6, range=1, ap_cost=2),
+        position=(16, 7),
+    )
+
+def create_enemy() -> Character:
+    return Character(
+        name="Scavenger",
+        stats={"Health": 5, "Agility": 3, "Strength": 5, "Thinking": 1, "Endurance": 6},
+        hp="Health" * 5,
+        max_hp="Health" * 5,
+        weapon=Weapon(name="Baseball Bat", damage=6, range=2, ap_cost=2),
+        position=(16, 7),
+    )
+
+def create_enemy() -> Character:
+    return Character(
+        name="Joe The Scavenger",
+        stats={"Health": 8, "Agility": 7, "Strength": 6, "Thinking": 3, "Endurance": 9},
+        hp="Health" * 5,
+        max_hp="Health" * 5,
+        weapon=Weapon(name="Assault Rifle", damage=10, range=5, ap_cost=6),
+        position=(16, 7),
+    )
