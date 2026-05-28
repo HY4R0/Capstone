@@ -1,7 +1,7 @@
 import pygame
 from entities import Character, Weapon, create_player, create_enemy
 from enum import Enum, auto
-
+# import pytmx
 
 pygame.init()
 
@@ -21,23 +21,9 @@ class TurnState(Enum):
 
 
 
-def draw_grid(surface: pygame.Surface) -> None:
-    level = {
-        0: [
-            "####################",
-            "#.................#",
-            "#.................#",
-            "#.................#",
-            "####################",
-        ],
-    }
-    for y, row in enumerate(level[0]):
-        for x, tile in enumerate(row):
-            rect = pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
-            if tile == "#":
-                pygame.draw.rect(surface, (100, 100, 100), rect)
-            else:
-                pygame.draw.rect(surface, (50, 50, 50), rect)
+# def load_map(filepath: str):
+#     """Load a TMX map file using pytmx."""
+#     return pytmx.load_pygame(filepath)
 
 
 def draw_characters(surface: pygame.Surface, player: Character, enemy: Character) -> None:
@@ -46,7 +32,7 @@ def draw_characters(surface: pygame.Surface, player: Character, enemy: Character
 
 
 def draw_ui(surface: pygame.Surface, player: Character, enemy: Character, state: TurnState, message: str) -> None:
-    # draw combat UI and status text
+    
     pass
 
 
@@ -64,6 +50,9 @@ def main() -> None:
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("PlaceHolder")
     clock = pygame.time.Clock()
+
+    # Load the tilemap
+    # game_map = load_map("level.tmx")
 
     player = create_player()
     enemy = create_enemy()
@@ -85,7 +74,6 @@ def main() -> None:
             player.start_turn()
 
         screen.fill((0, 0, 0))
-        draw_grid(screen)
         draw_characters(screen, player, enemy)
         draw_ui(screen, player, enemy, state, message)
 
