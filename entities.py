@@ -57,3 +57,5 @@ def create_enemy() -> Character:
         weapon=Weapon(name="Assault Rifle", damage=1, range=5),
         position=(16, 7),
     )
+
+#def note ():
