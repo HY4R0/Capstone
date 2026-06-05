@@ -26,26 +26,26 @@ class MapArea:
 
 
 AREAS: dict[str, MapArea] = {
-    "Ruins": MapArea(
-        name="Ruins",
+    "Superstore": MapArea(
+        name="Superstore",
         player_start=(2, 7),
         enemy_start=(16, 7),
         bg_color=(20, 20, 40),
-        teleport_spots={"Outpost": (3, 2), "Shore": (17, 12)},
+        teleport_spots={"Wasteland": (3, 2), "Laboratory": (17, 12)},
     ),
-    "Outpost": MapArea(
-        name="Outpost",
+    "Wasteland": MapArea(
+        name="Wasteland",
         player_start=(2, 7),
         enemy_start=(16, 7),
         bg_color=(50, 30, 10),
-        teleport_spots={"Ruins": (2, 2), "Shore": (17, 12)},
+        teleport_spots={"Superstore": (2, 2), "Laboratory": (17, 12)},
     ),
-    "Shore": MapArea(
-        name="Shore",
+    "Laboratory": MapArea(
+        name="Laboratory",
         player_start=(2, 7),
         enemy_start=(16, 7),
         bg_color=(10, 30, 80),
-        teleport_spots={"Ruins": (2, 2), "Outpost": (17, 12)},
+        teleport_spots={"Superstore": (2, 2), "Wasteland": (17, 12)},
     ),
 }
 
@@ -174,7 +174,7 @@ def draw_ui(surface: pygame.Surface, player: Character, enemy: Character, area: 
     surface.blit(hp_surf, (10, GRID_HEIGHT * TILE_SIZE + 10))
     enemy_surf = font.render(f"{enemy.name} HP: {enemy.hp}/{enemy.max_hp}", True, (255, 255, 255))
     surface.blit(enemy_surf, (250, GRID_HEIGHT * TILE_SIZE + 10))
-    area_surf = font.render(f"Area: {area.name}  [1]Ruins [2]Outpost [3]Shore  [T] teleport pad", True, (255, 255, 255))
+    area_surf = font.render(f"Area: {area.name}  [1]Superstore [2]Wasteland [3]Laboratory  [T] teleport pad", True, (255, 255, 255))
     surface.blit(area_surf, (10, GRID_HEIGHT * TILE_SIZE + 40))
     msg_surf = font.render(message, True, (255, 255, 0))
     surface.blit(msg_surf, (10, GRID_HEIGHT * TILE_SIZE + 70))
@@ -240,7 +240,7 @@ def process_player_input(event: pygame.event.Event, player: Character, enemy: Ch
             enemy.hp -= player.weapon_ranged.damage
             message = f"You shoot {enemy.name}!"
         else:
-            message = "Enemy out of range!"
+            message = "Enemy is too far!"
     return message
 
 
@@ -277,7 +277,7 @@ def main() -> None:
         pygame.quit()
         return
 
-    current_area = AREAS["Ruins"]
+    current_area = AREAS["Superstore"]
     player = create_player(player_name)
     enemy = create_enemy()
     current_area = load_area(current_area.name, player, enemy)
@@ -292,7 +292,7 @@ def main() -> None:
                 running = False
             elif not game_over and event.type == pygame.KEYDOWN:
                 if event.key in (pygame.K_1, pygame.K_2, pygame.K_3):
-                    target_area = {pygame.K_1: "Ruins", pygame.K_2: "Outpost", pygame.K_3: "Shore"}[event.key]
+                    target_area = {pygame.K_1: "Superstore", pygame.K_2: "Wasteland", pygame.K_3: "Laboratory"}[event.key]
                     if current_area.name != target_area:
                         current_area = load_area(target_area, player, enemy)
                         message = f"Teleported to {target_area}."
