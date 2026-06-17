@@ -357,7 +357,7 @@ def main():
 
     pygame.quit()
 
-
+# Main game
 if __name__ == "__main__":
     main()
 
