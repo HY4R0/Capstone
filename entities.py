@@ -146,7 +146,7 @@ def create_enemy_for_area(area_name):
         },
         "Summit": {
             "name": "Skeleton Dragon",
-            "stats": {"Health": 15, "Agility": 15, "Strength": 15, "Thinking": 15, "Endurance": 15},
+            "stats": {"Health": 20, "Agility": 15, "Strength": 15, "Thinking": 15, "Endurance": 15},
             "weapon_name": "Breath",
             "damage": 15,
             "range": 8,

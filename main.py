@@ -29,9 +29,8 @@ pygame.init()
 
 
 def upgrade_weapon(player, choice):
-    # choice 1..4
     if choice == 1 and player.weapon_melee:
-        player.weapon_melee.damage = player.weapon_melee.damage + 2
+        player.weapon_melee.damage = player.weapon_melee.damage + 4
     elif choice == 2 and player.weapon_ranged:
         player.weapon_ranged.damage = player.weapon_ranged.damage + 2
         player.weapon_ranged.range = player.weapon_ranged.range + 1
@@ -79,10 +78,10 @@ def draw_upgrade_screen(surface, player):
 
     melee_damage = player.weapon_melee.damage + 4
     ranged_damage = player.weapon_ranged.damage + 2
-    ranged_range = player.weapon_ranged.range + 0.5
+    ranged_range = player.weapon_ranged.range + 1
 
     melee_text = "[1] Melee: " + player.weapon_melee.name + " (+ 4 damage) - New Damage: " + str(melee_damage)
-    ranged_text = "[2] Ranged: " + player.weapon_ranged.name + " (+ 2 damage, + 0.5 range) - New Damage: " + str(ranged_damage) + ", New Range: " + str(ranged_range)
+    ranged_text = "[2] Ranged: " + player.weapon_ranged.name + " (+ 2 damage, + 1 range) - New Damage: " + str(ranged_damage) + ", New Range: " + str(ranged_range)
 
     health_name = player.health.name if hasattr(player, 'health') else "Medkit"
     heal_text = "[3] Heal: " + health_name + " + 10 HP (Current: " + str(player.hp) + "/" + str(player.max_hp) + ")"
@@ -129,6 +128,31 @@ def draw_victory_screen(surface, player):
     pygame.display.flip()
 
 
+def draw_defeat_screen(surface, player, enemy, reason_message):
+    surface.fill((40, 10, 10))
+
+    font_title = pygame.font.SysFont(None, 64)
+    font_text = pygame.font.SysFont(None, 32)
+
+    title = font_title.render("DEFEAT!", True, (255, 60, 60))
+
+    if reason_message:
+        message = font_text.render(reason_message, True, (255, 255, 255))
+    else:
+        message = font_text.render(enemy.name + " wins!", True, (255, 255, 255))
+
+    hp_text = font_text.render("Final HP: " + str(player.hp) + "/" + str(player.max_hp), True, (255, 200, 120))
+    exit_text = font_text.render("Press any key to exit...", True, (200, 200, 200))
+
+    surface.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 80))
+    surface.blit(message, (SCREEN_WIDTH // 2 - message.get_width() // 2, 180))
+    surface.blit(hp_text, (50, 280))
+    surface.blit(exit_text, (SCREEN_WIDTH // 2 - exit_text.get_width() // 2, 500))
+
+    pygame.display.flip()
+
+
+
 def draw_characters(surface, player, enemy):
     player_x = player.position[0]
     player_y = player.position[1]
@@ -158,10 +182,12 @@ def main():
     game_over = False
     upgrade_screen = False
     victory = False
+    defeat = False
 
     next_area_unlocked = False
     enemy_timer = 0
     areas_completed = 0
+
 
     running = True
     while running:
@@ -174,6 +200,17 @@ def main():
 
             clock.tick(FPS)
             continue
+
+        if defeat:
+            draw_defeat_screen(screen, player, enemy, message)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT or event.type == pygame.KEYDOWN:
+                    running = False
+
+            clock.tick(FPS)
+            continue
+
 
         if upgrade_screen:
             draw_upgrade_screen(screen, player)
@@ -268,7 +305,14 @@ def main():
 
             elif player.hp <= 0:
                 game_over = True
+                defeat = True
                 message = enemy.name + " wins!"
+
+                if current_area.next_area is None:
+                    victory = False
+
+
+
 
         # enemy turn on a timer
         if not game_over:
@@ -283,8 +327,10 @@ def main():
         if not game_over:
             if player.hp <= 0:
                 game_over = True
+                defeat = True
                 message = enemy.name + " wins!"
             elif enemy.hp <= 0:
+
                 game_over = True
                 if current_area.next_area is None:
                     victory = True
